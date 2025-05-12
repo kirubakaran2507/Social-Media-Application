@@ -1,0 +1,117 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class User {
+    private String userName;
+    private String password;
+    private List<Post> posts;
+    private Scanner scanner = new Scanner(System.in);
+
+    public User(String userName,String password){
+        this.userName = userName;
+        this.password = password;
+        posts = new ArrayList<>();
+    }
+
+    public void showUserName(){
+        System.out.println("Username : "+userName);
+    }
+
+    public void addPost(Post post){
+        posts.add(post);
+    }
+
+    public void viewPost(User user){
+        for (Post post : posts){
+            if (post.getPrivacy()!=null && isGroupNotContainsThisUser(post,user)) {
+                continue;
+            }
+            post.viewPost();
+        }
+        System.out.println("-----------------------");
+    }
+
+    private boolean isGroupNotContainsThisUser(Post post,User user) {
+        Group group = post.getPrivacy();
+
+        for (User user1 : group.getUsers()){
+            if (user1.equals(user)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void viewHeading(User user){
+        for (Post post : posts){
+            if (post.getPrivacy()!=null && isGroupNotContainsThisUser(post,user)) {
+                continue;
+            }
+            post.viewHeading();
+        }
+        System.out.println("-----------------------");
+    }
+
+    public void commentPost(int postNo,String comment,User user){
+        Post post = getPost(postNo);
+
+        if (post.getCommentSetting().equalsIgnoreCase("off")){
+            System.out.println("Comment section is off");
+            return;
+        }
+        if (post.getCommentSetting().equalsIgnoreCase("once")){
+            if (isAlreadyCommented(post,user)){
+                System.out.println("Only one comment is allowed");
+                return;
+            }
+        }
+
+        Comment comment1 = new Comment(comment,user);
+        post.addComment(comment1);
+    }
+
+    private boolean isAlreadyCommented(Post post,User user){
+        for (Comment comment : post.getComments()){
+            if (comment.getUser().equals(user)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void editCommentSetting(int postNo) {
+        Post post = getPost(postNo);
+        System.out.println("Enter new comment setting");
+        String commentSetting = scanner.next();
+
+        post.setCommentSetting(commentSetting);
+        System.out.println("Comment setting updated to "+commentSetting);
+    }
+
+    public void likePost(int postNo,User user){
+        Post post = getPost(postNo);
+        post.addLikedUser(user);
+    }
+
+    public void dislikePost(int postNo,User user){
+        Post post = getPost(postNo);
+        post.addDislikedUser(user);
+    }
+
+    public Post getPost(int postNo){
+        for (Post post : posts){
+            if (post.getPostNo()==postNo){
+                return post;
+            }
+        }
+        return null;
+    }
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
