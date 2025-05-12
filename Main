@@ -1,0 +1,154 @@
+import javax.swing.text.html.StyleSheet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.SplittableRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Instagram instagram = Instagram.getInstance();
+
+    public static void main(String[] args) {
+
+        boolean isTrue = true;
+
+        while (isTrue){
+            System.out.println("1.SignUp");
+            System.out.println("2.SignIn");
+            System.out.println("3.Create post");
+            System.out.println("4.View post");
+            System.out.println("5.Comment post");
+            System.out.println("6.Edit comment setting");
+            System.out.println("7.Like post");
+            System.out.println("8.Dislike post");
+            System.out.println("9.Create group");
+            System.out.println("10.Exit");
+
+            int choice = scanner.nextInt();
+            switch (choice){
+                case 1:
+                    System.out.println("Enter username");
+                    String userName = scanner.next();
+                    if (isNameAlreadyExists(userName)) continue;
+                    System.out.println("Enter password");
+
+                    String password = scanner.next();
+                    /*if (!isValidPassword(password)){
+                        System.out.println("Password should contain at least 8 characters,one uppercase,one lowercase and one " +
+                                "special characters)");
+                        continue;
+                    }*/
+                    instagram.signUp(userName,password);
+                    break;
+                case 2:
+                    System.out.println("Enter username");
+                    userName = scanner.next();
+                    System.out.println("Enter password");
+                    password = scanner.next();
+
+                /*    if (!isValidPassword(password)){
+                        System.out.println("Password should contain at least 8 characters,one uppercase,one lowercase and one " +
+                                "special characters)");
+                        continue;
+                    }*/
+                    instagram.signIn(userName,password);
+                    break;
+                case 3:
+                    createPost();
+                    break;
+                case 4:
+                    viewPost();
+                    break;
+                case 5:
+                    commentPost();
+                    break;
+                case 6:
+                    instagram.editCommentSetting();
+                    break;
+                case 7:
+                    likePost();
+                    break;
+                case 8:
+                    dislikePost();
+                    break;
+                case 9:
+                    createGroup();
+            }
+        }
+    }
+
+    public static void createPost(){
+        System.out.println("Post heading");
+        String heading = scanner.next();
+        System.out.println("Post content");
+        String content = scanner.next();
+        System.out.println("Comment setting (off,once,multiple)");
+        String commentSetting = scanner.next();
+        System.out.println("Post visibility (public,if group only,enter group name)");
+        String visibility = scanner.next();
+
+        instagram.createPost(heading,content,commentSetting,visibility);
+    }
+
+    public static void viewPost(){
+        System.out.println("Enter username");
+        String userName = scanner.next();
+
+        instagram.viewPost(userName);
+    }
+
+    public static void commentPost(){
+        System.out.println("Enter username");
+        String userName = scanner.next();
+        instagram.viewPost(userName);
+        System.out.println("Enter post no to comment");
+        int postNo = scanner.nextInt();
+        System.out.println("Enter comment");
+        String comment = scanner.next();
+
+        instagram.commentPost(userName,postNo,comment);
+    }
+
+    public static void likePost(){
+        System.out.println("Enter username");
+        String userName = scanner.next();
+
+        instagram.likePost(userName);
+    }
+
+    public static void dislikePost(){
+        System.out.println("Enter username");
+        String userName = scanner.next();
+
+        instagram.dislikePost(userName);
+    }
+
+    public static void createGroup(){
+        System.out.println("Group name");
+        String groupName = scanner.next();
+        System.out.println("Add users");
+        instagram.createGroup(groupName);
+    }
+
+    private static boolean isNameAlreadyExists(String name) {
+        List<User> users = instagram.getUsers();
+
+        for (User user : users){
+            if (user.getUserName().equals(name)){
+                System.out.println("Username already exists");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isValidPassword(String password){
+        String regex = "^(?=.[a-z])(?=.[A-Z])(?=.*d)(?=.[@!%?&])[A-Za-z\\d@!]";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(password);
+
+        return matcher.matches();
+    }
+}
