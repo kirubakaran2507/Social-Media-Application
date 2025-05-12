@@ -1,0 +1,134 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class Post {
+    private static int no;
+    private int postNo;
+    private String heading;
+    private String content;
+    private User author;
+    private String commentSetting;
+    private int noOfComments;
+    private int noOfLikes;
+    private int noOfDislikes;
+    private List<User> likedUsers = new ArrayList<>();
+    private List<User> dislikedUsers = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
+    private Group privacy;
+
+    public Post(String heading,String content,User author,String commentSetting,Group privacy){
+        postNo = ++no;
+        this.heading = heading;
+        this.content = content;
+        this.author = author;
+        this.commentSetting = commentSetting;
+        this.privacy = privacy;
+        noOfLikes = 0;
+        noOfDislikes = 0;
+    }
+
+    public void createPost(){
+
+    }
+
+    public void addComment(Comment comment){
+        noOfComments++;
+        comments.add(comment);
+        System.out.println("Comment added");
+    }
+
+    public void viewHeading(){
+        System.out.println("Post no        " + postNo);
+        System.out.println("Heading        " + heading);
+        System.out.println("-------------------------");
+    }
+
+    public void viewPost(){
+        System.out.println("Post no        " + postNo);
+        System.out.println("Heading        " + heading);
+        System.out.println("Content        " + content);
+        System.out.println("Author         " + author.getUserName());
+        System.out.println("No of likes    " + noOfLikes);
+        System.out.println("No of dislikes    " + noOfDislikes);
+        System.out.println("No of comments "+ noOfComments);
+        viewComments();
+        System.out.println("---------------------------------------");
+    }
+
+    private void viewComments(){
+        for (Comment comment : comments){
+            System.out.println("Comment no "+comment.getCommentNo());
+            System.out.println(comment.getComment());
+        }
+        System.out.println("--------------------------------");
+    }
+
+    public void editCommentSetting(){
+
+    }
+
+    public int getPostNo() {
+        return postNo;
+    }
+
+    public void setCommentSetting(String commentSetting) {
+        this.commentSetting = commentSetting;
+    }
+
+    public String getCommentSetting() {
+        return commentSetting;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public int getNoOfLikes() {
+        return noOfLikes;
+    }
+
+    public void setNoOfLikes(int noOfLikes) {
+        this.noOfLikes = noOfLikes;
+    }
+
+    public void addLikedUser(User user){
+        if (isAlreadyLiked(user)){
+            System.out.println("Once liked,can't change");
+            return;
+        }
+        noOfLikes++;
+        likedUsers.add(user);
+    }
+
+    public void addDislikedUser(User user){
+        if (isAlreadyDisLiked(user)){
+            System.out.println("Once liked,can't change");
+            return;
+        }
+        noOfDislikes++;
+        dislikedUsers.add(user);
+    }
+
+    private boolean isAlreadyLiked(User user){
+        for (User user1 : likedUsers){
+            if(user1.equals(user)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isAlreadyDisLiked(User user){
+        for (User user1 : dislikedUsers){
+            if(user1.equals(user)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Group getPrivacy() {
+        return privacy;
+    }
+}
