@@ -1,0 +1,173 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Stream;
+
+public class Instagram {
+    private static Instagram instagram=null;
+    private Scanner scanner = new Scanner(System.in);
+    private List<User> users = new ArrayList<>();
+    private List<Group> groups = new ArrayList<>();
+    private User loggedInUser = null;
+
+    public static Instagram getInstance(){
+        if (instagram==null){
+            instagram = new Instagram();
+        }
+        return instagram;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void signUp(String userName, String password){
+        User user = new User(userName,password);
+        users.add(user);
+        System.out.println("Signup successful");
+    }
+
+    public void signIn(String userName,String password){
+        User user = isUserExists(userName,password);
+
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+
+        loggedInUser = user;
+        System.out.println("Signed in successful");
+    }
+
+    private User isUserExists(String userName,String password){
+        for (User user : users){
+            if (user.getUserName().equals(userName) && user.getPassword().equals(password)){
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    private User getUser(String userName){
+        for (User user : users){
+            if (user.getUserName().equals(userName)){
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    public void createPost(String heading,String content,String commentSetting,String groupName){
+        Group group = null;
+        if (!groupName.equalsIgnoreCase("public")){
+            group = isGroupExists(groupName);
+        }
+
+        Post post = new Post(heading,content,loggedInUser,commentSetting,group);
+        loggedInUser.addPost(post);
+    }
+
+    private Group isGroupExists(String groupName){
+        for (Group group : groups){
+            if (group.getName().equals(groupName)){
+                return group;
+            }
+        }
+        return null;
+    }
+
+    public void viewPost(String userName){
+        User user = getUser(userName);
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+        if (!user.equals(loggedInUser)){
+            viewPostHeading(userName);
+            return;
+        }
+        user.viewPost(loggedInUser);
+    }
+
+    public void viewPostHeading(String userName){
+        User user = getUser(userName);
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+        user.viewHeading(loggedInUser);
+    }
+
+    public void commentPost(String userName,int postNo,String comment){
+        User user = getUser(userName);
+
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+        user.commentPost(postNo,comment,user);
+    }
+
+    public void editCommentSetting(){
+        System.out.println("Enter post no");
+        int postNo = scanner.nextInt();
+
+        loggedInUser.editCommentSetting(postNo);
+    }
+
+    public void likePost(String userName){
+        User user = getUser(userName);
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+
+        System.out.println("Enter post no to like");
+        int postNo = scanner.nextInt();
+
+        user.likePost(postNo,user);
+    }
+
+    public void dislikePost(String userName){
+        User user = getUser(userName);
+        if (user==null){
+            System.out.println("User doesn't exists");
+            return;
+        }
+        user.viewHeading(user);
+        System.out.println("Enter post no to dislike");
+        int postNo = scanner.nextInt();
+
+        user.dislikePost(postNo,user);
+    }
+
+    public void createGroup(String groupName){
+        Group group = new Group(groupName);
+
+        showAllUsers();
+        System.out.println("Enter no of users to add");
+        int noOfUsers = scanner.nextInt();
+
+        for (int i=0;i<noOfUsers;){
+            String userName = scanner.next();
+            User user = getUser(userName);
+
+            if (user!=null){
+                group.addUser(user);
+                i++;
+            }
+        }
+
+        groups.add(group);
+        System.out.println("Group "+groupName+" created");
+    }
+
+    private void showAllUsers(){
+        for (User user : users){
+            user.showUserName();
+        }
+        System.out.println("---------------------");
+    }
+}
